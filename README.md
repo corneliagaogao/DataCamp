@@ -309,6 +309,220 @@ geom_point(  )
 
 ```
 
+Add a geom_bar() call to cyl.am. By default, the position will be set to "stack".
+Fill in the second ggplot command. Explicitly set position to "fill" inside geom_bar().
+Fill in the third ggplot command. Set position to "dodge".
+The position = "dodge" version seems most appropriate. Finish off the fourth ggplot command by completing the three scale_ functions:
+scale_x_discrete() takes as its only argument the x-axis label: "Cylinders".
+scale_y_continuous() takes as its only argument the y-axis label: "Number".
+scale_fill_manual() fixes the legend. The first argument is the title of the legend: "Transmission". Next, values and labels are set to predefined values for you. These are the colors and the labels in the legend.
+
+```
+# The base layer, cyl.am, is available for you
+# Add geom (position = "stack" by default)
+cyl.am + 
+geom_bar()
+
+# Fill - show proportion
+cyl.am + 
+  geom_bar(position = "fill")  
+
+# Dodging - principles of similarity and proximity
+cyl.am +
+  geom_bar(position = "dodge") 
+
+# Clean up the axes with scale_ functions
+val = c("#E41A1C", "#377EB8")
+lab = c("Manual", "Automatic")
+cyl.am +
+  geom_bar(position = "dodge") +
+  scale_x_discrete("Cylinders") + 
+  scale_y_continuous("Number") +
+  scale_fill_manual("Transmission", 
+                    values = val,
+                    labels = lab) 
+                    
+```
+
+Try to run ggplot(mtcars, aes(x = mpg)) + geom_point() in the console. x is only one of the two essential aesthetics for geom_point(), which is why you get an error message.
+1 - To fix this, map a value, e.g. 0, instead of a variable, onto y. Use geom_jitter() to avoid having all the points on a horizontal line.
+2 - To make everything look nicer, copy & paste the code for plot 1 and change the limits of the y axis using the appropriate scale_y_...() function. Set the limits argument to c(-2, 2).
+
+
+```
+# 1 - Create jittered plot of mtcars, mpg onto x, 0 onto y
+ggplot(mtcars, aes(x = mpg, y =0)) +
+  geom_jitter()
+
+# 2 - Add function to change y axis limits
+ggplot(mtcars, aes(x = mpg, y =0)) +
+  geom_jitter() +
+  scale_y_continuous(limits = c(-2,2))
+
+```
+
+
+Overplotting 1 - Point shape and transparency
+In the previous section you saw that there are lots of ways to use aesthetics. Perhaps too many, because although they are possible, they are not all recommended. Let's take a look at what works and what doesn't.
+
+So far you've focused on scatter plots since they are intuitive, easily understood and very common. A major consideration in any scatter plot is dealing with overplotting. You'll encounter this topic again in the geometries layer, but you can already make some adjustments here.
+
+You'll have to deal with overplotting when you have:
+
+Large datasets,
+Imprecise data and so points are not clearly separated on your plot (you saw this in the video with the iris dataset),
+Interval data (i.e. data appears at fixed values), or
+Aligned data values on a single axis.
+One very common technique that I'd recommend to always use when you have solid shapes it to use alpha blending (i.e. adding transparency). An alternative is to use hollow shapes. These are adjustments to make before even worrying about positioning. This addresses the first point as above, which you'll see again in the next exercise.
+
+Instructions
+100 XP
+Instructions
+100 XP
+Begin by making a basic scatter plot of mpg (y) vs. wt (x), map cyl to color and make the size = 4. cyl has already been converted to a factor variable for you.
+Modify the above plot to set shape to 1. This allows for hollow circles.
+Modify the first plot to set alpha to 0.6.
+
+
+```
+# Basic scatter plot: wt on x-axis and mpg on y-axis; map cyl to col
+ggplot(mtcars, aes(x= wt, y = mpg, col =cyl))+
+geom_point(size = 4)
+
+
+# Hollow circles - an improvement
+ggplot(mtcars, aes(x= wt, y = mpg, col =cyl))+
+geom_point(size = 4, shape = 1)
+
+
+# Add transparency - very nice
+ggplot(mtcars, aes(x= wt, y = mpg, col =cyl, alpha = 0.6))+
+geom_point(size = 4, shape = 1, alpha = 0.6)
+
+```
+
+
+Overplotting 2 - alpha with large datasets
+In a previous exercise we defined four situations in which you'd have to adjust for overplotting. You'll consider the last two here with the diamonds dataset:
+
+Large datasets.
+Aligned data values on a single axis
+Instructions
+100 XP
+Instructions
+100 XP
+The diamonds data frame is available in the ggplot2 package. Begin by making a basic scatter plot of price (y) vs. carat (x) and map clarity onto color.
+Copy the above functions and set the alpha to 0.5. This is a good start to dealing with the large dataset.
+Align all the diamonds within a clarity class, by plotting carat (y) vs. clarity (x). Map price onto color. alpha should still be 0.5.
+In the previous plot, all the individual values line up on a single axis within each clarity category, so you have not overcome overplotting. Modify the above plot to use the position = "jitter" inside geom_point().
+
+
+```
+# Scatter plot: carat (x), price (y), clarity (color)
+ggplot(diamonds, aes(carat, price, col = clarity)) +
+geom_point()
+
+
+# Adjust for overplotting
+ggplot(diamonds, aes(carat, price, col = clarity)) +
+geom_point(alpha = 0.5)
+
+
+# Scatter plot: clarity (x), carat (y), price (color)
+ggplot(diamonds, aes(clarity, carat, col = price)) +
+geom_point(alpha = 0.5)
+
+
+# Dot plot with jittering
+ggplot(diamonds, aes(clarity, carat, col = price)) +
+geom_point(alpha = 0.5, position = "jitter")
+
+
+```
+
+Scatter plots and jittering (1)
+You already saw a few examples using geom_point() where the result was not a scatter plot. For example, in the plot shown in the viewer a continuous variable, wt, is mapped to the y aesthetic, and a categorical variable, cyl, is mapped to the x aesthetic. This also leads to over-plotting, since the points are arranged on a single x position. You previously dealt with overplotting by setting the position = jitter inside geom_point(). Let's look at some other solutions here.
+
+Instructions
+100 XP
+Instructions
+100 XP
+Beginning with the code for the plot in the viewer (given), make these modifications
+
+1 - Use a shortcut geom, geom_jitter(), instead of geom_point().
+2 - Unfortunately, the width of the jitter is a bit too wide to be useful. Adjust this by setting the argument width = 0.1 inside geom_jitter().
+3 - Finally, return to geom_point() and set the position argument here to position_jitter(0.1), which will set the jittering width directly inside a points layer.
+Note: For convenience, you could have saved the data and aesthetic layers as a ggplot2 object and re-used it in all solutions. We've made each plot explicit so that you can see all plotting instructions.
+
+
+
+```
+
+
+# Shown in the viewer:
+ggplot(mtcars, aes(x = cyl, y = wt)) +
+  geom_point()
+
+# Solutions:
+# 1 - With geom_jitter()
+ggplot(mtcars, aes(x = cyl, y = wt)) +
+  geom_jitter()
+
+# 2 - Set width in geom_jitter()
+ggplot(mtcars, aes(x = cyl, y = wt)) +
+  geom_jitter(width = 0.1)
+
+# 3 - Set position = position_jitter() in geom_point() ()
+ggplot(mtcars, aes(x = cyl, y = wt)) +
+  geom_point(position = position_jitter(0.1))
+```
+
+
+Scatter plots and jittering (2)
+In the chapter on aesthetics you saw different ways in which you will have to compensate for overplotting. In the video you saw a dataset that suffered from overplotting because of the precision of the dataset.
+
+Another example you saw is when you have integer data. This can be continuous data measured on an integer (i.e. 1 ,2, 3 ...), as opposed to numeric (i.e. 1.1, 1.4, 1.5, ...), scale, or two categorical (e.g. factor) variables, which are just type integer under-the-hood.
+
+In such a case you'll have a small, defined number of intersections between the two variables.
+
+You will be using the Vocab dataset. The Vocab dataset contains information about the years of education and integer score on a vocabulary test for over 21,000 individuals based on US General Social Surveys from 1972-2004.
+
+Instructions
+100 XP
+Instructions
+100 XP
+The Vocab data frame has been loaded for you. Both the education and vocabulary variables are classified as integers. You can imagine these as factor variables, but here, integers are more convenient to work with. First, get familiar with the dataset by looking at its structure with str().
+Make a basic scatter plot of vocabulary (y) vs. education (x). Here it becomes apparent that you have issues with overplotting because of the integer scales.
+Use geom_jitter() instead of geom_point().
+Using the jittered plot, set alpha to 0.2 (very low).
+Using the jittered plot, set shape to 1.
+
+```
+
+# Examine the structure of Vocab
+str(Vocab)
+
+# Basic scatter plot of vocabulary (y) against education (x). Use geom_point()
+ggplot(Vocab, aes(education, vocabulary) )+
+geom_point()
+
+
+# Use geom_jitter() instead of geom_point()
+ggplot(Vocab, aes(education, vocabulary) )+
+geom_jitter()
+
+
+# Using the above plotting command, set alpha to a very low 0.2
+ggplot(Vocab, aes(education, vocabulary) )+
+geom_jitter(alpha = 0.2)
+
+
+# Using the above plotting command, set the shape to 1
+ggplot(Vocab, aes(education, vocabulary) )+
+geom_jitter(alpha = 0.2, shape = 1)
+```
+
+
 
 
 
