@@ -272,6 +272,187 @@ ui <- dashboardPage(header = dashboardHeader(),
 shinyApp(ui, server)
 ```
 
+Review selectInput and sliderInput
+As a quick refresher, using the dashboardSidebar() function along with selectInput() and sliderInput() from the shiny package, you can create select lists and sliders. For example, to create a select list in the sidebar, you can do the following:
+
+sidebar <- dashboardSidebar(
+  selectInput(inputId = "numbers",
+              label = "Numbers",
+              choices = 1:3)
+  )
+For this chapter, we are working with the dplyr starwars dataset, a data set pulled from the Star Wars API containing information about characters from Star Wars. We are interested in creating a subset of the data set of characters between specified height parameters. For this exercise, create a slider to indicate the maximum height you'd like in your subset.
+
+Instructions
+100 XP
+Create a slider in the sidebar with the following parameters:
+inputId: "height", label: "Height", min: 66, max: 264, value: 264.
+Rerun the shiny app with these updates.
+
+```
+sidebar <- dashboardSidebar(
+  # Add a slider
+  sliderInput("height", "Height", 66, 264, 264)
+)
+
+ui <- dashboardPage(header = dashboardHeader(),
+                    sidebar = sidebar,
+                    body = dashboardBody()
+                    )
+shinyApp(ui, server) 
+```
+
+Reactive expression practice
+Using the dplyr starwars dataset, create a shiny app that allows the user to select a character by name and output the selected name in the body. The data frame is already loaded as starwars.
+
+Instructions
+100 XP
+Instructions
+100 XP
+Create a select list in the Sidebar where the choices are the characters' name with:
+inputId: "name", label: "Name", choices: starwars$name.
+Output the name selected in the body using the renderText() and textOutput() functions. Use the output ID "name".
+Rerun the shiny app with these updates.
+
+```
+library(shiny)
+sidebar <- dashboardSidebar(
+  # Create a select list
+  selectInput(inputId = "name", label ="Name",choices = starwars$name)
+)
+
+body <- dashboardBody(
+  textOutput("name")
+)
+
+ui <- dashboardPage(header = dashboardHeader(),
+                    sidebar = sidebar,
+                    body = body
+                    )
+
+server <- function(input, output) {
+  output$name <- renderText({
+      input$name
+    })
+}
+
+shinyApp(ui, server)
+```
+
+
+Read in real-time data
+One benefit of a dashboard is the ability to examine real-time data. In shiny, this can be done using the reactiveFileReader() or reactivePoll() functions from the shiny package. For example, if we had our data saved as a .csv, we could read it in using reactiveFileReader() along with the readFunc set to read.csv.
+
+filepath <- "data.csv"
+
+server <- function(input, output, session) {
+  reactive_data <- reactiveFileReader(
+    intervalMillis = 1000,
+    session = session, 
+    filePath = filepath,
+    readFunc = read.csv
+  )
+}
+We have our data saved as a .csv located at a url called starwars_url; this object is already loaded for your convenience. In order to read this in, we can set our own readFunc like this:
+
+readFunc = function(filePath) { 
+  read.csv(url(filePath))
+  }
+If this .csv were updated live, we would see the changes! Read in this real-time data using reactiveFileReader().
+
+Instructions
+100 XP
+Instructions
+100 XP
+Read in starwars_url using reactiveFileReader().
+Set your intervalMillis to 1000.
+Rerun the shiny app with these updates.
+
+```
+library("shiny")
+
+server <- function(input, output, session) {
+  reactive_starwars_data <- reactiveFileReader(
+         1000,
+         session = session, 
+    filePath =starwars_url,
+        
+         readFunc = function(filePath) { 
+           read.csv(url(filePath))
+         }
+  )
+}
+
+ui <- dashboardPage(header = dashboardHeader(),
+                    sidebar = dashboardSidebar(),
+                    body = dashboardBody()
+                    )
+shinyApp(ui, server)
+
+```
+
+View real-time data
+Now that you've read in the real-time data as reactive_starwars_data(), you can examine it as it updates using renderTable(). If you save this reactive table, you can then render it using the tableOutput() function. For example, if we had a reactive data frame called my_reactive_data() we could save this as output$my_table and render it using tableOutput() with the following code:
+
+server <- function(input, output, session) {
+  output$my_table <- renderTable({
+    my_reactive_data()
+  })
+}
+
+body <- dashboardBody(
+  tableOutput("my_table")
+)
+Instructions
+100 XP
+Using the reactive dataset you just read in, create a reactive table called output$table.
+Render this table in the body.
+Rerun the shiny app with these updates.
+
+```
+library(shiny)
+
+server <- function(input, output, session) {
+  reactive_starwars_data <- reactiveFileReader(
+        intervalMillis = 1000,
+        session = session,
+        filePath = starwars_url,
+        readFunc = function(filePath) { 
+           read.csv(url(filePath))
+         }
+         )
+   
+  output$table <- renderTable({
+    reactive_starwars_data()
+})
+}
+
+body <- dashboardBody(
+  tableOutput("table")
+)
+
+ui <- dashboardPage(header = dashboardHeader(),
+                    sidebar = dashboardSidebar(),
+                    body = body
+                    )
+shinyApp(ui, server)
+```
+
+
+Optimize this
+You have a file that is static that you want your users to have access to. Optimize the code below for this circumstance. The name of the file path for the file you'd like to read in is saved and loaded in the object starwars_filepath.
+
+Instructions
+100 XP
+Examine the code below -- think about how many times the data will be read in.
+Update the sample code to be more efficient.
+
+```
+starwars <- read.csv(starwars_filepath)
+server <- function(input, output) { 
+}
+```
+
+
 
 
 
