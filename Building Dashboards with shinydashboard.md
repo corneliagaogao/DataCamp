@@ -452,6 +452,90 @@ server <- function(input, output) {
 }
 ```
 
+Create reactive menu items
+We have added dynamic content via subsetting a data frame based on using input and reading in real-time data. Now we are going to allow the user to input task_data to determine task items. Recall that we can use an apply() function to iterate over a data frame, applying the taskItem() function to each row.
+
+tasks <- apply(task_data, 1, function(row) { 
+  taskItem(text = row[["text"]],
+           value = row[["value"]])
+})
+dropdownMenu(type = "tasks", .list = tasks)
+You have a data frame (already loaded) called task_data with columns text and value. Use this to create a task drop down menu.
+
+Instructions
+0 XP
+Create a list of tasks called tasks from the task_data data frame, like in the code chunk provided.
+Create the task drop down menu from your tasks list.
+Output a reactive task menu to output$task_menu and render the newly created reactive task menu in the dashboardHeader().
+Rerun the shiny app with these updates.
+
+
+
+```
+server <- function(input, output) {
+  output$task_menu <- renderMenu({
+      tasks <- apply(task_data, 1, function(row) {
+        taskItem(text = row[["text"]],
+                 value = row[["value"]])
+                 })
+    
+      dropdownMenu(type = "tasks", .list = tasks)
+  })
+}
+
+header <- dashboardHeader(dropdownMenuOutput("task_menu"))
+
+ui <- dashboardPage(header = header,
+                    sidebar = dashboardSidebar(),
+                    body = dashboardBody()
+                    )
+shinyApp(ui, server)
+
+```
+
+
+Create reactive boxes
+In addition to updating the task drop down menus reactively, it is possible to create reactive boxes in the body. Here, you have a clickable action button in your sidebar. You want to update a value box each time the user clicks the action button. The valueBox() function will create a value box in the body. This takes the following form:
+
+valueBox(value = 10,
+        subtitle = "There are ten things here!"
+        )
+Instructions
+70 XP
+Create a reactive value box called click_box that increases in value each time the user clicks the action button.
+Set the subtitle of the reactive value box to "Click Box".
+Render the reactive value box in the body.
+Rerun the shiny app with these updates.
+
+```
+library("shiny")
+sidebar <- dashboardSidebar(
+  actionButton("click", "Update click box")
+) 
+
+server <- function(input, output) {
+  output$click_box <- renderValueBox({
+    valueBox(
+      value = input$click,
+      subtitle = "Click Box"
+    )
+  })
+}
+
+body <- dashboardBody(
+      valueBoxOutput("click_box")
+ )
+
+
+ui <- dashboardPage(header = dashboardHeader(),
+                    sidebar = sidebar,
+                    body = body
+                    )
+shinyApp(ui, server)
+
+```
+
+
 
 
 
